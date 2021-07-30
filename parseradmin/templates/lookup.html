@@ -1,0 +1,18 @@
+{% if entry %}
+    <p><strong>{{ entry.keyword_main }}</strong></p>
+    <ul>
+    {% for s in entry.syntax %}
+        <li>Syntax: <i>{{ s }}</i></li>
+    {% endfor %}
+    </ul>
+    <p>{{ entry.description | linebreaks }}</p>
+    {% if entry.see_also %}
+        <p>See also:
+        {% for s in entry.see_also %}
+            <a href="{{ s }}">{{ s }}</a>
+        {% endfor %}
+        </p>
+    {% endif %}
+{% else %}
+    <p>No matching Entry is found.</p>
+{% endif %}

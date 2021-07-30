@@ -1,0 +1,47 @@
+version: '3.7'
+
+services:
+  web:
+    build: .
+    command: python manage.py runserver 0.0.0.0:${PORT}
+    environment:
+      DEBUG: "${DEBUG}"
+      DATABASE_URL: "${DATABASE_URL}"
+      PORT: "${PORT}"
+      REDIS_URL: "${REDIS_URL}"
+      SERVERNAMES: "${SERVERNAMES}"
+    volumes:
+      - .:/app
+    ports:
+      - "${PORT}:${PORT}"
+    depends_on:
+      - db
+      - redis
+    links:
+      - redis
+
+  db:
+    image: postgres:latest
+    restart: always
+    environment:
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_USER: postgres
+      POSTGRES_DB: "${DATABASE_NAME}"
+    volumes:
+      - pgdata:/var/lib/postgresql/data/
+
+  rq:
+    build: .
+    command: ./compose/run_rq.sh
+    links:
+      - redis
+
+  redis:
+    image: bitnami/redis:latest
+    restart: always
+    environment:
+      ALLOW_EMPTY_PASSWORD: 1
+      REDIS_PORT_NUMBER: 7000
+
+volumes:
+  pgdata:
