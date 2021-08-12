@@ -166,6 +166,7 @@ class GameHelpFileFormat:
             descriptionText = '\n'.join([x.strip() for x in recordLines if x.strip() != '~'])
 
             descriptionText = re.sub('\n\n([^\n])', r'\n\1', descriptionText)
+            descriptionText = re.sub('\\\\br\s', r'\n\n', descriptionText)
             descriptionText = re.sub('\n{3,}', r'\n\n', descriptionText)
             descriptionText = descriptionText.strip()
 
