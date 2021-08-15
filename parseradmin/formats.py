@@ -18,20 +18,19 @@ class GameHelpFileFormat:
         outputTxt = ''
         counter = 1
         for row in dset.dict:            
-            id = counter # row.get('id')
+            id = counter  # row.get('id')
             counter += 1
             restriction = row.get('restriction')
             restriction_type = row.get('restriction_type') + '~ ' if restriction in [RestrictionType.CLASS.value, RestrictionType.RACE.value, RestrictionType.CABAL.value, RestrictionType.PSALM.value] else ''
             keywords = ' '.join(["'" + k + "'" for k in row.get('keywords').split(',') if row.get('keywords')])
             # keywords = keywords + ' ' if keywords else ''
-            keyword_main = row.get('keyword_main') + (' ' if keywords else '')
+            keyword_main = "'" + row.get('keyword_main') + "'" + (' ' if keywords else '')
             syntax = '\n'.join(['Syntax: ' + s for s in row.get('syntax').split(',')]) + '\n' if row.get('syntax') else ''
             see_also = 'See also: ' + ', '.join(row.get('see_also').split(',')) + '\n' if row.get('see_also') else ''
-            description = '\n' + row.get('description') + '\n\n' if row.get('description') else ''
-
+            description = '\n' + row.get('description').replace('\\br ', '\n') + '\n\n' if row.get('description') else ''
             outputTxt += '#{id}\n{restriction} {restriction_type}{keyword_main}{keywords}~\n{keyword_main}\n{syntax}'\
-            '{description}{see_also}~\n\n'.format(id=id, restriction=restriction,restriction_type=restriction_type, 
-            keywords=keywords, keyword_main=keyword_main, syntax=syntax, description = description, see_also = see_also)
+            '{description}{see_also}~\n\n'.format(id=id, restriction=restriction, restriction_type=restriction_type,
+            keywords=keywords, keyword_main=keyword_main, syntax=syntax, description=description, see_also=see_also)
 
         # add end of file mark
         outputTxt += '#0'

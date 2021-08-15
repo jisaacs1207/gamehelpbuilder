@@ -1,0 +1,27 @@
+<div id="entry-preview" class="readonly">
+</div>
+
+<script>
+
+function formatPreview(text, numDigits, delimiter) {
+  return Array.from(text).reduce((accum, cur, idx) => {
+    return accum += (idx + 1) % numDigits === 0 ? cur + delimiter : cur;
+  }, '')
+}
+
+function update_preview(desc) {
+     var preview_content = desc;
+     // Format for each character add new line
+     preview_content = formatPreview(preview_content, 77, '<br>')
+     preview_content = preview_content.replaceAll('\\br', '<br>')
+     document.getElementById("entry-preview").innerHTML = preview_content;
+}
+
+
+(function() {
+    document.getElementById("id_description").addEventListener("input", function(event) {
+      update_preview(event.target.value);
+    });
+    update_preview(document.getElementById("id_description").value);
+})();
+</script>

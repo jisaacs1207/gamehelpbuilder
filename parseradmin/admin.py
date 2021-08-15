@@ -1,5 +1,6 @@
 from django.contrib import admin
 from .models import Entry
+from django import forms
 from django_better_admin_arrayfield.admin.mixins import DynamicArrayMixin
 from import_export import fields, resources
 from import_export.admin import ImportExportMixin
@@ -7,10 +8,34 @@ from import_export.tmp_storages import CacheStorage
 from simple_history.admin import SimpleHistoryAdmin
 from django.utils.html import format_html
 from django.urls import reverse
+from django.template import loader
+from django.utils.safestring import mark_safe
+
 from .formats import GameHelpFile
 
 from parseradmin.models import HelpUpload
 from parseradmin.tasks import process_gamehelp_export
+
+
+class PreviewWidget(forms.Widget):
+    template_name = 'widget_preview.html'
+
+    def get_context(self, name, value, attrs=None):
+        return {'widget': {
+            'name': name,
+            'value': value,
+        }}
+
+    def render(self, name, value, attrs=None, renderer=None):
+        context = self.get_context(name, value, attrs)
+        template = loader.get_template(self.template_name).render(context)
+        return mark_safe(template)
+
+
+class CustomForm(forms.ModelForm):
+    # Newly created field not retrieved from models.py
+    preview = forms.CharField(widget=PreviewWidget, required=False)
+
 
 class EntryResource(resources.ModelResource):    
     id = fields.Field(attribute='id', column_name='id')
@@ -26,17 +51,15 @@ class EntryResource(resources.ModelResource):
     def before_import(self, dataset, using_transactions, dry_run, **kwargs):
         Entry.objects.all().delete()
 
+
 class EntryAdmin(ImportExportMixin, DynamicArrayMixin, SimpleHistoryAdmin):
+    form = CustomForm
     tmp_storage_class = CacheStorage
     resource_class = EntryResource
     list_display = ['keyword_main', 'keywords']
     search_fields = ['keyword_main', 'keywords']
     readonly_fields = ['raw', 'lookup_link']
 
-    def get_form(self, request, *args, **kwargs):
-        self.request = request
-        return super().get_form(request, *args, **kwargs)
-    
     @admin.display(description='Lookup Link')
     def lookup_link(self, obj):
         lookupUri = ''
