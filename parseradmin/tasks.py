@@ -6,7 +6,7 @@ from parseradmin.models import HelpUpload
 
 
 @job
-def process_gamehelp_export(id):
+def process_gamehelp_export(upload_id=None):
     from parseradmin.admin import EntryResource
 
     er = EntryResource()
@@ -15,7 +15,8 @@ def process_gamehelp_export(id):
     with open(settings.MEDIA_ROOT + '/help_export.csv', 'w', encoding='UTF8', newline='') as f:
         f.write(dataset.csv)
 
-    # Mark upload as processed
-    help_upload_obj = HelpUpload.objects.get(pk=id)
-    help_upload_obj.processed = True
-    help_upload_obj.save()
+    if upload_id:
+        # Mark upload as processed
+        help_upload_obj = HelpUpload.objects.get(pk=id)
+        help_upload_obj.processed = True
+        help_upload_obj.save()

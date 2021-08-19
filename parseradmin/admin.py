@@ -36,6 +36,21 @@ class CustomForm(forms.ModelForm):
     # Newly created field not retrieved from models.py
     preview = forms.CharField(widget=PreviewWidget, required=False)
 
+    def save(self, commit=True):
+        if commit:
+            # If committing, save the instance and the m2m data immediately.
+            self.instance.save()
+            self._save_m2m()
+
+        # Queue export
+        process_gamehelp_export.delay()
+
+        return self.instance
+
+    def save_m2m(self):
+        pass
+
+
 
 class EntryResource(resources.ModelResource):    
     id = fields.Field(attribute='id', column_name='id')

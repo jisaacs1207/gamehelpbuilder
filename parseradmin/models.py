@@ -1,4 +1,6 @@
 from django.db import models
+from django.db.models.signals import post_delete
+from django.dispatch import receiver
 from django.utils.translation import gettext_lazy as _
 # from django.contrib.postgres.fields import ArrayField
 from django_better_admin_arrayfield.models.fields import ArrayField
@@ -6,6 +8,7 @@ from django.db.models import Q
 from simple_history.models import HistoricalRecords
 import textwrap
 import re
+
 
 class Entry(models.Model):
     
@@ -79,6 +82,12 @@ class Entry(models.Model):
 
         super(type(self), self).save(*args, **kwargs)
 
+
+@receiver(post_delete, sender=Entry)
+def handle_post_delete_entry(sender, **kwargs):
+    from .tasks import process_gamehelp_export
+
+    process_gamehelp_export.delay()
 
 class HelpUpload(models.Model):
     upload_file = models.CharField(max_length=255)
