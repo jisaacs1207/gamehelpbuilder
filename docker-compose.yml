@@ -11,10 +11,14 @@ services:
       SERVERNAMES: "${SERVERNAMES}"
     volumes:
       - .:/app
+      - ~/mediafiles:/app/mediafiles
     ports:
       - "${PORT}:${PORT}"
     depends_on:
       - db
+      - redis
+    links:
+      - redis
 
   db:
     image: postgres:latest
@@ -25,11 +29,21 @@ services:
       POSTGRES_DB: "${DATABASE_NAME}"
     volumes:
       - pgdata:/var/lib/postgresql/data/
-
+    ports:
+      - "5432:5432"
   rq:
     build: .
     command: ./compose/run_rq.sh
+    environment:
+      DEBUG: "${DEBUG}"
+      DATABASE_URL: "${DATABASE_URL}"
+      PORT: "${PORT}"
+      REDIS_URL: "${REDIS_URL}"
+      SERVERNAMES: "${SERVERNAMES}"
     links:
+      - redis
+    depends_on:
+      - db
       - redis
 
   redis:

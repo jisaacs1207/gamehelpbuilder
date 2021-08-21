@@ -12,6 +12,7 @@ services:
       SERVERNAMES: "${SERVERNAMES}"
     volumes:
       - .:/app
+      - ~/mediafiles:/app/mediafiles
     ports:
       - "${PORT}:${PORT}"
     depends_on:
@@ -33,6 +34,12 @@ services:
   rq:
     build: .
     command: ./compose/run_rq.sh
+    environment:
+      DEBUG: "${DEBUG}"
+      DATABASE_URL: "${DATABASE_URL}"
+      PORT: "${PORT}"
+      REDIS_URL: "${REDIS_URL}"
+      SERVERNAMES: "${SERVERNAMES}"
     links:
       - redis
 
@@ -40,8 +47,9 @@ services:
     image: bitnami/redis:latest
     restart: always
     environment:
-      ALLOW_EMPTY_PASSWORD: 1
+      ALLOW_EMPTY_PASSWORD: "yes"
       REDIS_PORT_NUMBER: 7000
-
+    ports:
+      - ${REDIS_PORT_NUMBER}:${REDIS_PORT_NUMBER}
 volumes:
   pgdata:
