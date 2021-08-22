@@ -2,18 +2,18 @@ from django.conf import settings
 
 from django_rq import job
 
-from parseradmin.models import HelpUpload
-
+from parseradmin.models import Entry, HelpUpload
 
 @job
 def process_gamehelp_export(upload_id=None):
     from parseradmin.admin import EntryResource
+    from parseradmin.formats import GameHelpFileFormat
 
-    er = EntryResource()
-    dataset = er.export()
+    data = EntryResource().export(Entry.objects.all())
+    export_data = GameHelpFileFormat.export_set(data)
 
-    with open(settings.MEDIA_ROOT + '/help_export.csv', 'w', encoding='UTF8', newline='') as f:
-        f.write(dataset.csv)
+    with open(settings.MEDIA_ROOT + '/help_export.txt', 'w', encoding='UTF8', newline='') as f:
+        f.write(export_data)
 
     if upload_id:
         # Mark upload as processed
