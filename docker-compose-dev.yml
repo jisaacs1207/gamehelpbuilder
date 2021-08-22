@@ -12,14 +12,14 @@ services:
       SERVERNAMES: "${SERVERNAMES}"
     volumes:
       - .:/app
-      - ~/mediafiles:/app/mediafiles
+      #- ~/mediafiles:/app/mediafiles
     ports:
       - "${PORT}:${PORT}"
     depends_on:
       - db
-      - redis
-    links:
-      - redis
+      #- redis
+    #links:
+    #  - redis
 
   db:
     image: postgres:latest
@@ -40,16 +40,18 @@ services:
       PORT: "${PORT}"
       REDIS_URL: "${REDIS_URL}"
       SERVERNAMES: "${SERVERNAMES}"
+    volumes:
+      - ~/mediafiles:/app/mediafiles    
     links:
       - redis
 
-  redis:
-    image: bitnami/redis:latest
-    restart: always
-    environment:
-      ALLOW_EMPTY_PASSWORD: "yes"
-      REDIS_PORT_NUMBER: 7000
-    ports:
-      - ${REDIS_PORT_NUMBER}:${REDIS_PORT_NUMBER}
+  #redis:
+  #  image: bitnami/redis:latest
+  #  restart: always
+  #  environment:
+  #    ALLOW_EMPTY_PASSWORD: "yes"
+  #    REDIS_PORT_NUMBER: 7000
+  #  ports:
+  #    - ${REDIS_PORT_NUMBER}:${REDIS_PORT_NUMBER}
 volumes:
   pgdata:

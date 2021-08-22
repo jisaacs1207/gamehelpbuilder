@@ -150,7 +150,7 @@ DATA_UPLOAD_MAX_NUMBER_FIELDS = 10240
 IMPORT_EXPORT_IMPORT_PERMISSION_CODE = 'can_import_entries'
 IMPORT_EXPORT_EXPORT_PERMISSION_CODE = 'can_export_entries'
 
-redis_url = parse.urlparse(os.environ.get('REDIS_URL', 'redis://redis:7000'))
+redis_url = parse.urlparse(os.environ.get('REDIS_URL', 'redis://127.0.0.1:6379'))
 RQ_QUEUES = {
     'default': {
         'HOST': redis_url.hostname,
