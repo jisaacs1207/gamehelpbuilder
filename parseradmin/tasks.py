@@ -17,6 +17,6 @@ def process_gamehelp_export(upload_id=None):
 
     if upload_id:
         # Mark upload as processed
-        help_upload_obj = HelpUpload.objects.get(pk=id)
+        help_upload_obj = HelpUpload.objects.get(pk=upload_id)
         help_upload_obj.processed = True
         help_upload_obj.save()
