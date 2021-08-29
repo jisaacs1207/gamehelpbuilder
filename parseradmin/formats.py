@@ -87,19 +87,32 @@ class GameHelpFileFormat:
             keywords = []
             #keywordsStart = recordLines[0].find(restrictionTypeSub) + len(restrictionTypeSub)+1 if restrictionTypeSub != '' else len(restrictionTypeRaw)
             keywordsStart = len(restrictionTypeRaw)
-            keywordsRaw = recordLines[0][keywordsStart:-1]
+            keywordsRaw = recordLines[0][keywordsStart:-1].strip()
+            # Quote first keyword if not already
+            if keywordsRaw and len(list(re.finditer(' ', keywordsRaw))) > 0 and keywordsRaw.strip()[0] != '\'':
+                if keywordsRaw.strip().find('\'') > -1:
+                    keywordsRaw = '\'' + keywordsRaw.strip()[0:keywordsRaw.strip().find('\'')-1] + '\'' + keywordsRaw.strip()[keywordsRaw.strip().find('\'')-1:]
             multiKeywordsRaw = re.findall(r'\'[^\']+\'', keywordsRaw)
             for k in multiKeywordsRaw:
-                keywords.append(k[1:-1])
-                keywordsRaw = keywordsRaw.replace(k, '')
-            singleKeywordsRaw = [x.strip() for x in keywordsRaw.split(' ') if x.strip() ]
+                if k[1:-1] != "'":
+                    keywords.append(k[1:-1])
+                    keywordsRaw = keywordsRaw.replace(k, '')
+
+            mainKeyword = None
+            if len(keywords) > 0:
+                singleKeywordsRaw = [x.strip() for x in keywordsRaw.split(' ') if x.strip() and x.strip() != "'" ]
+            else:
+                singleKeywordsRaw = [keywordsRaw]
+                mainKeyword = keywordsRaw
             keywords += singleKeywordsRaw
-            #remove duplicatss if any
+            #remove duplicates if any
             keywords = list(dict.fromkeys(keywords))
-            
-            mainKeywordMatch = re.match(r'^' + restrictionTypeRaw + r'\s+((\'[^\']+\')|([^\'][^\s~]+[\s~]))', recordLines[0])
-            mainKeyword = mainKeywordMatch.group(1) if mainKeywordMatch and len(mainKeywordMatch.groups())>1 else ''
-            mainKeyword = mainKeyword.translate({ord(x): '' for x in ['\'','~']}).strip()
+
+            if mainKeyword is None:
+                mainKeywordMatch = re.match(r'^' + restrictionTypeRaw + r'\s+((\'[^\']+\')|([^\'][^\s~]+[\s~]))', recordLines[0])
+                mainKeyword = mainKeywordMatch.group(1) if mainKeywordMatch and len(mainKeywordMatch.groups())>1 else ''
+                mainKeyword = mainKeyword.translate({ord(x): '' for x in ['\'','~']}).strip()
+
             mainKeyword = keywords[0] if len(keywords) and not mainKeyword else mainKeyword
             mainKeyword = mainKeyword.upper()
 
@@ -148,7 +161,8 @@ class GameHelpFileFormat:
             for k in multiKeywordsRaw:
                 seeAlso.append(k[1:-1])
                 seeAlsoRaw = seeAlsoRaw.replace(k, '')
-            singleKeywordsRaw = [x.strip() for x in seeAlsoRaw.split(',') if x.strip() ]
+            if len(seeAlsoRaw) > 0:
+                singleKeywordsRaw = [x.strip() for x in seeAlsoRaw.split(',') if x.strip() ]
             seeAlso += singleKeywordsRaw
             insensitive_help = re.compile(re.escape('help'), re.IGNORECASE)
             seeAlso = [insensitive_help.sub('',s.replace(',', '')).strip().upper() for s in seeAlso if s.lower() != 'help' and s.strip()]

@@ -43,7 +43,8 @@ class CustomForm(forms.ModelForm):
             self._save_m2m()
 
         # Queue export
-        process_gamehelp_export.delay()
+        #process_gamehelp_export.delay()
+        process_gamehelp_export()
 
         return self.instance
 
@@ -103,7 +104,8 @@ class EntryAdmin(ImportExportMixin, DynamicArrayMixin, SimpleHistoryAdmin):
             user_id=request.user.id
         )
         # Process export
-        process_gamehelp_export.delay(hu.id)
+        #process_gamehelp_export.delay(hu.id)
+        process_gamehelp_export(hu.id)
 
 
 class HelpUploadAdmin(admin.ModelAdmin):
