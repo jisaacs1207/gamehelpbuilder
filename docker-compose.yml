@@ -34,6 +34,7 @@ services:
   rq:
     build: .
     #command: ./compose/run_rq.sh
+    restart: always
     entrypoint: "python manage.py rqworker default"
     environment:
       DEBUG: "${DEBUG}"
