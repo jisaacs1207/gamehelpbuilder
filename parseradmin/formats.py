@@ -24,7 +24,7 @@ class GameHelpFileFormat:
             restriction_type = row.get('restriction_type') + '~ ' if restriction in [RestrictionType.CLASS.value, RestrictionType.RACE.value, RestrictionType.CABAL.value, RestrictionType.PSALM.value] else ''
             keywords = ' '.join(["'" + k + "'" for k in row.get('keywords').split(',') if row.get('keywords')])
             # keywords = keywords + ' ' if keywords else ''
-            keyword_main = row.get('keyword_main') + (' ' if keywords else '')
+            keyword_main = "'" + row.get('keyword_main') + "'" + (' ' if keywords else '')
             syntax = '\n'.join(['Syntax: ' + s for s in row.get('syntax').split(',')]) + '\n' if row.get('syntax') else ''
             see_also = 'See also: ' + ', '.join(row.get('see_also').split(',')) + '\n' if row.get('see_also') else ''
             description = '\n' + row.get('description').replace('\\br ', '\n') + '\n\n' if row.get('description') else ''
