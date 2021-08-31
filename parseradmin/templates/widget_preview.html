@@ -22,21 +22,23 @@ function wordWrapToStringList (text, maxLength) {
 
 function formatPreview(text, numDigits, delimiter) {
   var adjusted_text = text.replaceAll('\r\n', '\n');
-  adjusted_text = adjusted_text.replaceAll('<br>', '\n\n');
+  adjusted_text = adjusted_text.replaceAll('\\br', '<br>');
   adjusted_text = adjusted_text.split(/\n{2,}/g);
   var wrapped_text = [];
   adjusted_text.forEach((p) => {
-      wrapped_text.push(wordWrapToStringList(p.replaceAll('\n', ' '), 77))
-    });
-  return wrapped_text.join('<br><br>').replaceAll('~', '')
+      wrapped_text.push(wordWrapToStringList(p.replaceAll('\n', ' ').replaceAll('~', ''), numDigits))
+  });
+  adjusted_text = '';
+  wrapped_text.forEach((p) => {
+    adjusted_text = adjusted_text + '' + p.join(delimiter)
+  })
+  return adjusted_text
 }
 
 function update_preview(desc) {
      var preview_content = desc;
      // Format for each character add new line
-     preview_content = preview_content.replaceAll('\\br', '<br>')
      preview_content = formatPreview(preview_content, 77, '<br>')
-
      document.getElementById("entry-preview").innerHTML = preview_content;
 }
 
