@@ -36,22 +36,6 @@ class CustomForm(forms.ModelForm):
     # Newly created field not retrieved from models.py
     preview = forms.CharField(widget=PreviewWidget, required=False)
 
-    def save(self, commit=True):
-        if commit:
-            # If committing, save the instance and the m2m data immediately.
-            self.instance.save()
-            self._save_m2m()
-
-        # Queue export
-        #process_gamehelp_export.delay()
-        process_gamehelp_export()
-
-        return self.instance
-
-    def save_m2m(self):
-        pass
-
-
 
 class EntryResource(resources.ModelResource):    
     id = fields.Field(attribute='id', column_name='id')
@@ -104,8 +88,13 @@ class EntryAdmin(ImportExportMixin, DynamicArrayMixin, SimpleHistoryAdmin):
             user_id=request.user.id
         )
         # Process export
-        #process_gamehelp_export.delay(hu.id)
-        process_gamehelp_export(hu.id)
+        process_gamehelp_export.delay(hu.id)
+
+    def save_model(self, request, obj, form, change):
+        super().save_model(request, obj, form, change)
+
+        # Queue export
+        process_gamehelp_export.delay()
 
 
 class HelpUploadAdmin(admin.ModelAdmin):
