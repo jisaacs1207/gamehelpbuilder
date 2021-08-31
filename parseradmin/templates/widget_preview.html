@@ -3,17 +3,40 @@
 
 <script>
 
+function wordWrapToStringList (text, maxLength) {
+    var result = [], line = [];
+    var length = 0;
+    text.split(" ").forEach(function(word) {
+        if ((length + word.length) >= maxLength) {
+            result.push(line.join(" "));
+            line = []; length = 0;
+        }
+        length += word.length + 1;
+        line.push(word);
+    });
+    if (line.length > 0) {
+        result.push(line.join(" "));
+    }
+    return result;
+}
+
 function formatPreview(text, numDigits, delimiter) {
-  return Array.from(text).reduce((accum, cur, idx) => {
-    return accum += (idx + 1) % numDigits === 0 ? cur + delimiter : cur;
-  }, '')
+  var adjusted_text = text.replaceAll('\r\n', '\n');
+  adjusted_text = adjusted_text.replaceAll('<br>', '\n\n');
+  adjusted_text = adjusted_text.split(/\n{2,}/g);
+  var wrapped_text = [];
+  adjusted_text.forEach((p) => {
+      wrapped_text.push(wordWrapToStringList(p.replaceAll('\n', ' '), 77))
+    });
+  return wrapped_text.join('<br><br>').replaceAll('~', '')
 }
 
 function update_preview(desc) {
      var preview_content = desc;
      // Format for each character add new line
-     preview_content = formatPreview(preview_content, 77, '<br>')
      preview_content = preview_content.replaceAll('\\br', '<br>')
+     preview_content = formatPreview(preview_content, 77, '<br>')
+
      document.getElementById("entry-preview").innerHTML = preview_content;
 }
 
