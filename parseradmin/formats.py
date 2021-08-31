@@ -108,10 +108,10 @@ class GameHelpFileFormat:
             #remove duplicates if any
             keywords = list(dict.fromkeys(keywords))
 
-            if mainKeyword is None:
-                mainKeywordMatch = re.match(r'^' + restrictionTypeRaw + r'\s+((\'[^\']+\')|([^\'][^\s~]+[\s~]))', recordLines[0])
-                mainKeyword = mainKeywordMatch.group(1) if mainKeywordMatch and len(mainKeywordMatch.groups())>1 else ''
-                mainKeyword = mainKeyword.translate({ord(x): '' for x in ['\'','~']}).strip()
+            #if mainKeyword is None:
+            #    mainKeywordMatch = re.match(r'^' + restrictionTypeRaw + r'\s+((\'[^\']+\')|([^\'][^\s~]+[\s~]))', recordLines[0])
+            #    mainKeyword = mainKeywordMatch.group(1) if mainKeywordMatch and len(mainKeywordMatch.groups())>1 else ''
+            #    mainKeyword = mainKeyword.translate({ord(x): '' for x in ['\'','~']}).strip()
 
             mainKeyword = keywords[0] if len(keywords) and not mainKeyword else mainKeyword
             mainKeyword = mainKeyword.upper()
