@@ -68,7 +68,8 @@ class Entry(models.Model):
         if self.description:
             width = 77
             adjusted_description = self.description.replace('\r\n','\n')
-            adjusted_description = re.split('\n{2,}', adjusted_description)            
+            adjusted_description = adjusted_description.replace('\\br', '\n')
+            adjusted_description = re.split('\n{2,}', adjusted_description)
             adjusted_description = ['\n'.join(textwrap.wrap(p.replace('\n',' '), width, break_long_words=False)) for p in adjusted_description]
             self.description = '\n\n'.join(adjusted_description).replace('~', '')
         if self.restriction_type:
