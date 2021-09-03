@@ -68,11 +68,25 @@ class Entry(models.Model):
         if self.description:
             width = 77
             adjusted_description = self.description.replace('\r\n', '\n')
-            adjusted_description = adjusted_description.replace('\\br', '\n')
+            adjusted_description = adjusted_description.replace('\\br', '|')
             adjusted_description = re.split('\n{2,}', adjusted_description)
-            adjusted_description = ['\n'.join(p for p in adjusted_description)]
-            self.description = '\n\n'.join(adjusted_description).replace('~', '')
-            #self.description = textwrap.wrap(self.description, width, break_long_words=False)
+            wrapped_description = []
+            new_description = ''
+            # Check for wordwrap issues
+            num_paragraphs = len(adjusted_description)
+            cur_paragraph = 0
+
+            for item in adjusted_description:
+                cur_paragraph += 1
+                for line in item.split('\n'):
+                    wrapped_description.append(textwrap.wrap(line.replace('\n', ' '), width, break_long_words=False))
+                if cur_paragraph < num_paragraphs:
+                    wrapped_description.append('\n')
+
+            for item in wrapped_description:
+                new_description += '\n'.join(item) + '\n'
+
+            self.description = new_description.replace('~', '').replace('|', '\n')
         if self.restriction_type:
             self.restriction_type = self.restriction_type.replace('~', '')
         if self.keyword_main:
