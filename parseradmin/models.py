@@ -67,11 +67,12 @@ class Entry(models.Model):
             self.keywords = [k.replace('~', '') for k in self.keywords if type(self).objects.filter(~Q(keyword_main = self.keyword_main) & (Q(keywords__contains=[k]) | Q(keyword_main = k)) ).count() == 0]
         if self.description:
             width = 77
-            adjusted_description = self.description.replace('\r\n','\n')
+            adjusted_description = self.description.replace('\r\n', '\n')
             adjusted_description = adjusted_description.replace('\\br', '\n')
             adjusted_description = re.split('\n{2,}', adjusted_description)
-            adjusted_description = ['\n'.join(textwrap.wrap(p.replace('\n',' '), width, break_long_words=False)) for p in adjusted_description]
+            adjusted_description = ['\n'.join(p for p in adjusted_description)]
             self.description = '\n\n'.join(adjusted_description).replace('~', '')
+            #self.description = textwrap.wrap(self.description, width, break_long_words=False)
         if self.restriction_type:
             self.restriction_type = self.restriction_type.replace('~', '')
         if self.keyword_main:
