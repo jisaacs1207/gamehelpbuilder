@@ -1,3 +1,4 @@
+from django.conf import settings
 from django.contrib import admin
 from .models import Entry
 from django import forms
@@ -16,7 +17,7 @@ from .formats import GameHelpFile
 from parseradmin.models import HelpUpload
 from parseradmin.tasks import process_gamehelp_export
 
-
+'''
 class PreviewWidget(forms.Widget):
     template_name = 'widget_preview.html'
 
@@ -31,11 +32,10 @@ class PreviewWidget(forms.Widget):
         template = loader.get_template(self.template_name).render(context)
         return mark_safe(template)
 
-
 class CustomForm(forms.ModelForm):
     # Newly created field not retrieved from models.py
     preview = forms.CharField(widget=PreviewWidget, required=False)
-
+'''
 
 class EntryResource(resources.ModelResource):    
     id = fields.Field(attribute='id', column_name='id')
@@ -53,18 +53,19 @@ class EntryResource(resources.ModelResource):
 
 
 class EntryAdmin(ImportExportMixin, DynamicArrayMixin, SimpleHistoryAdmin):
-    form = CustomForm
+    #form = CustomForm
     tmp_storage_class = CacheStorage
     resource_class = EntryResource
     list_display = ['keyword_main', 'keywords']
     search_fields = ['keyword_main', 'keywords']
-    readonly_fields = ['raw', 'lookup_link']
+    readonly_fields = ['lookup_link']
+    exclude = ['raw']
 
     @admin.display(description='Lookup Link')
     def lookup_link(self, obj):
         lookupUri = ''
         if obj.keyword_main:
-            lookupUri = self.request.build_absolute_uri(reverse('lookup', args=[obj.keyword_main]))
+            lookupUri = settings.LOOKUP_URL_DOMAIN + reverse('lookup', args=[obj.keyword_main])
             lookupUri = format_html('<a href="{0}" target="_blank">{0}</a>', lookupUri)
         return lookupUri
     

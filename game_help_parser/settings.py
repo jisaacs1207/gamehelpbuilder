@@ -31,6 +31,7 @@ DEBUG = os.environ.get('DEBUG', False) == 'True'
 
 ALLOWED_HOSTS = os.environ.get('SERVERNAMES', default='').split(' ')
 
+LOOKUP_URL_DOMAIN = 'https://help.aelisus.com'
 
 # Application definition
 
