@@ -80,11 +80,16 @@ class Entry(models.Model):
                 cur_paragraph += 1
                 for line in item.split('\n'):
                     wrapped_description.append(textwrap.wrap(line.replace('\n', ' '), width, break_long_words=False))
+
                 if cur_paragraph < num_paragraphs:
                     wrapped_description.append('\n')
 
             for item in wrapped_description:
                 new_description += '\n'.join(item) + '\n'
+
+            new_description = new_description.replace('\n\n', '\n')
+            if new_description[len(new_description)-1] == '\n':
+                new_description = new_description[:len(new_description) - 1]
 
             self.description = new_description.replace('~', '').replace('|', '\n')
         if self.restriction_type:
